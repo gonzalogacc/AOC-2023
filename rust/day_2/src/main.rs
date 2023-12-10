@@ -93,7 +93,7 @@ fn games_filter(games: & Vec<Game>, bag: & Batch) -> i32 {
 }
 
 fn main() {
-    let games = load_games(String::from("./test_input.txt"));
+    let games = load_games(String::from("./input.txt"));
     let bag: Batch = Batch::new("12 red, 13 green, 14 blue");
     let total = games_filter(& games, &bag);
     println!("{}", total)

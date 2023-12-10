@@ -66,7 +66,21 @@ impl Game {
         }
         true
     }
+
+    fn min_dice_set(&self) -> Batch {
+        let red = self.batches.iter().map(|b| b.red).max().unwrap();
+        let green = self.batches.iter().map(|b| b.green).max().unwrap();
+        let blue = self.batches.iter().map(|b| b.blue).max().unwrap();
+        Batch {red, green, blue}
+    }
+
+    fn compute_dice_power(&self) -> i32 {
+        let min_dice_set = self.min_dice_set();
+        min_dice_set.red * min_dice_set.green * min_dice_set.blue
+    }
+
 }
+
 
 fn load_games(filename: String) -> Vec<Game> {
     let mut games: Vec<Game> = Vec::new();
@@ -82,6 +96,7 @@ fn load_games(filename: String) -> Vec<Game> {
     games
 }
 
+
 fn games_filter(games: & Vec<Game>, bag: & Batch) -> i32 {
     let mut id_sum: i32 = 0;
     for game in games {
@@ -92,11 +107,22 @@ fn games_filter(games: & Vec<Game>, bag: & Batch) -> i32 {
     id_sum
 }
 
+fn games_total_power(games: & Vec<Game>) -> i32 {
+    let mut power_sum: i32 = 0;
+    for game in games {
+        power_sum += game.compute_dice_power();
+    }
+    power_sum
+}
+
 fn main() {
     let games = load_games(String::from("./input.txt"));
     let bag: Batch = Batch::new("12 red, 13 green, 14 blue");
     let total = games_filter(& games, &bag);
-    println!("{}", total)
+    let power_sum = games_total_power(&games);
+
+    println!("Games filer: {}", total);
+    println!("Power sum: {}", power_sum);
 }
 
 
@@ -179,4 +205,31 @@ fn test_read_file() {
     assert_eq!(games[2].batches[2].red, 1);
     assert_eq!(games[2].batches[2].green, 5);
     assert_eq!(games[2].batches[2].blue, 0);
+}
+
+
+#[test]
+fn test_dice_set_power(){
+    let game1 = Game::new("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green");
+    assert_eq!(game1.compute_dice_power(), 48);
+
+    let game2 = Game::new("Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue");
+    assert_eq!(game2.compute_dice_power(), 12);
+
+    let game3 = Game::new("Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red");
+    assert_eq!(game3.compute_dice_power(), 1560);
+
+    let game4 = Game::new("Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red");
+    assert_eq!(game4.compute_dice_power(), 630);
+
+    let game5 = Game::new("Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green");
+    assert_eq!(game5.compute_dice_power(), 36);
+}
+
+#[test]
+fn test_min_dice_set() {
+    let game1 = Game::new("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green");
+    assert_eq!(game1.min_dice_set().red, 4);
+    assert_eq!(game1.min_dice_set().green, 2);
+    assert_eq!(game1.min_dice_set().blue, 6);
 }

@@ -45,7 +45,8 @@ class Game:
         return red, green, blue
 
     def compute_dice_power(self):
-        return reduce(lambda x, y: x*y, self.min_dice_set())
+        return reduce(lambda x, y: x * y, self.min_dice_set())
+
 
 def load_games(filename: str) -> List[Game]:
     return [Game(line.strip()) for line in open(filename)]
